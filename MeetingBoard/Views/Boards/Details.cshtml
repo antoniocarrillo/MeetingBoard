@@ -1,0 +1,54 @@
+﻿@model MeetingNotes.Models.Models.Board
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<h1>Details</h1>
+
+<div>
+    <h4>Board</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Background)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Background)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+<div id="board">
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        const CreateNoteAction = '@Url.Action("Create","Notes")'
+        const EditNoteSizeAction = '@Url.Action("EditSize","Notes")'
+        const EditNotePositionAction = '@Url.Action("EditPosition","Notes")'
+        const ChangeNoteTextAction = '@Url.Action("ChangeText","Notes")'
+        let DeleteNoteAction = '@Url.Action("Delete","Notes")'
+        let notesArray = @Html.Raw(Json.Serialize(Model.Notes));
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}
