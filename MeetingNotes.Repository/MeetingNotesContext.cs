@@ -14,7 +14,16 @@ namespace MeetingNotes.Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            modelBuilder.Entity<Board>()
+                .HasMany(b => b.Notes)
+                .WithOne(n => n.Board)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Board>()
+            //   .HasMany(e => e.Users)
+            //   .WithOne(e => e.Board)
+            //   .OnDelete(DeleteBehavior.ClientCascade);
         }
 
         public MeetingNotesContext(DbContextOptions<MeetingNotesContext> options) : base(options)

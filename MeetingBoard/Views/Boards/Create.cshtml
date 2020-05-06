@@ -24,12 +24,12 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="HasPassword" /> @Html.DisplayNameFor(model => model.HasPassword)
+                    <input id="password-checkbox" class="form-check-input" asp-for="HasPassword" /> @Html.DisplayNameFor(model => model.HasPassword)
                 </label>
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input id="password-field" asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -45,4 +45,22 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    $(document).ready(function () {
+        handleCheckboxChanged();
+
+        $('#password-checkbox').on("click",
+            function () {
+                handleCheckboxChanged();
+            });
+        });
+
+    let handleCheckboxChanged = function () {
+        if ($('#password-checkbox').is(':checked')) {
+            $("#password-field").removeAttr('disabled');
+        } else {
+            $("#password-field").attr("disabled", "disabled");
+        };
+    };
+</script>
 }

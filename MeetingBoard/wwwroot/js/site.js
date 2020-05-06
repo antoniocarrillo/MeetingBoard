@@ -11,9 +11,30 @@ const defaultWidth = 300
 const defaultHeight = 300
 
 
-$(document).ready(function() {
+$(document).ready(function () {
+    //var container = $("#main-container");
+    //var boardDefinition = {
+    //    id: "board"
+    //};
+    //var board = $("<div>", boardDefinition);
+    $("<div id='board'></div>").insertAfter("#main-container");
     $.each(notesArray, function(index, value) {
         handleNoteCreatedEvent(value.id, value.x, value.y, value.width, value.height, value.text);
+    });
+
+    $("#board").click(function (e) {
+        console.log("click board");
+        if (e.which != 1) {
+            return;
+        }
+        createNote(e);
+    });
+    $("#board").mousedown(function () {
+        console.log("mousedown board");
+
+    });
+    $("#board").mouseup(function (e) {
+        console.log("mouseup board");
     });
 
     var pathArray = window.location.pathname.split('/');
@@ -77,20 +98,7 @@ let createNote = function(e) {
 //    });
 //}
 
-$("#board").click(function (e) {
-    console.log("click board");
-    if (e.which != 1) {
-        return;
-    }
-    createNote(e);
-});
-$("#board").mousedown(function () {
-    console.log("mousedown board");
 
-});
-$("#board").mouseup(function (e) {
-    console.log("mouseup board");
-});
 
 let handleStartDragging = function(event, ui) {
     isDragging = true;

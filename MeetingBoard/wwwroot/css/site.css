@@ -194,10 +194,18 @@ textarea:focus {
     cursor: default;
 }
 
+.password-protected{
+    color:red;
+}
+
+.not-password-protected{
+    color:green;    
+}
+
 .action-button {
     color: white;
     position: absolute;
-    top: -20px;
+    top: -24px;
     width: 20px;
     height: 24px;
     border-radius: 4px 4px 0 0;

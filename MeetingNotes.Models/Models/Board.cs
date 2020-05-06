@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using MeetingBoard.Encryption;
 
 namespace MeetingNotes.Models.Models
 {
@@ -25,8 +28,15 @@ namespace MeetingNotes.Models.Models
         public List<User> Users { get; set; }
 
         [Required]
+        [DisplayName("Password Protected")]
         public bool HasPassword { get; set; }
+        
+        public string PasswordStored { get; set; }
 
-        public string Password { get; set; }
+        [NotMapped]
+        public string Password {
+            get { return Encryption.DecryptString(PasswordStored); }
+            set { PasswordStored = Encryption.EncryptString(value); }
+        }
     }
 }

@@ -4,50 +4,55 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Boards</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create New Board</a>
 </p>
-<table class="table">
+<table id="boards-table" class="display table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Background)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.HasPassword)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Password)
+               Actions
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Background)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HasPassword)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Password)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </a>
+                </td>
+                <td>
+                    @if (item.HasPassword)
+                    {
+                        <i class="material-icons password-protected">lock</i>
+                    }
+                    else
+                    {
+                        <i class="material-icons not-password-protected">lock_open</i>
+                    }
+                </td>
+                <td>
+                    <a class="delete-board" asp-action="Edit" asp-route-id="@item.Id"><i class="material-icons">edit</i></a>
+
+                    <a class="delete-board" asp-action="Delete" asp-route-id="@item.Id"><i class="material-icons">delete</i></a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts
+{
+    <script src="~/js/boards.js" asp-append-version="true"></script>
+}
