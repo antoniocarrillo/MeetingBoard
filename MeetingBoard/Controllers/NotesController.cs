@@ -190,13 +190,12 @@ namespace MeetingBoard.Controllers
 
         // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<bool> DeleteConfirmed(int id)
         {
             var note = await _context.Notes.FindAsync(id);
             _context.Notes.Remove(note);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return true;
         }
 
         private bool NoteExists(int id)

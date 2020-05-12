@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit";
+    string[] backgrounds = new string[] { "cork", "chalk" }; //TODO: This is a horrible way to do this. Fix it
 }
 
 <h1>Edit</h1>
@@ -19,13 +20,16 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Background" class="control-label"></label>
-                <input asp-for="Background" class="form-control" />
-                <span asp-validation-for="Background" class="text-danger"></span>
+                @Html.DropDownList("Fonts",
+                       new SelectList(backgrounds),
+                       "white",
+                       new { id = "background-selector", @class = "dropdown" })
+
+                @Html.HiddenFor(model => model.Background)
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input disabled id="password-checkbox" class="form-check-input" asp-for="HasPassword" /> @Html.DisplayNameFor(model => model.HasPassword)
+                    <input id="password-checkbox" class="form-check-input" asp-for="HasPassword" /> @Html.DisplayNameFor(model => model.HasPassword)
                 </label>
             </div>
             <div class="form-group">
@@ -41,6 +45,10 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
+    <script>
+            $("#background-selector").change(function () {
+                var newBackground = $("#background-selector").val();
+                $("#Background").val(newBackground);
+    });
+    </script>
     }
-}

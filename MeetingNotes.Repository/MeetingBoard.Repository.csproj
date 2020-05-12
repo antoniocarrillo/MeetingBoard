@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MeetingNotes.Models\MeetingNotes.Models.csproj" />
+    <ProjectReference Include="..\MeetingNotes.Models\MeetingBoard.Models.csproj" />
   </ItemGroup>
 
 </Project>

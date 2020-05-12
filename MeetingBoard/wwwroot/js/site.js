@@ -10,6 +10,8 @@ let boardId = 0;
 const defaultWidth = 300
 const defaultHeight = 300
 
+let zIndexCounter = 4
+
 
 $(document).ready(function () {
     //var container = $("#main-container");
@@ -18,9 +20,13 @@ $(document).ready(function () {
     //};
     //var board = $("<div>", boardDefinition);
     $("<div id='board'></div>").insertAfter("#main-container");
-    $.each(notesArray, function(index, value) {
+
+    $.each(notesArray, function (index, value) {
         handleNoteCreatedEvent(value.id, value.x, value.y, value.width, value.height, value.text);
     });
+
+
+    $("#board").addClass(boardBackground + "-background");
 
     $("#board").click(function (e) {
         console.log("click board");
@@ -61,6 +67,16 @@ $(document).ready(function () {
 
     connection.on("DeleteNote", function (id) {
         handleNoteDeletedEvent(id);
+    });
+
+    connection.on("BringToFront", function (id) {
+        handleBringToFrontEvent(id);
+       
+    });
+
+    $("#font-selector").change(function () {
+        var newFont = $("#font-selector").val();
+        $(".note").css("font-family", newFont);
     });
 });
 
@@ -174,7 +190,7 @@ let sendResizeNoteRequest = function(id, width, height) {
 let sendMoveNoteRequest = function(id, x, y) {
     $.ajax({
         type: "POST",
-        url: EditNoteSizeAction,
+        url: EditNotePositionAction,
         data: { id: id, x: x, y: y },
         dataType: "json",
         success: function(res) {
@@ -209,7 +225,8 @@ let sendChangeNoteTextRequest = function(id, text) {
 
 let sendDeleteNoteRequest = function(id) {
     $.ajax({
-        type: "GET",
+        type: "POST",
+        data: { id: id },
         url: DeleteNoteAction + "/" + id,
         success: function(res) {
             connection.invoke("DeleteNote", parseInt(id)).catch(function(err) {
@@ -227,20 +244,29 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
 
     var note = {
         id: "note-" + id,
-        class: "note",
+        class: "note disabled",
         css: {
             "width": width,
             "height": height,
             "top": y,
             "left": x,
             "position": "absolute",
-            "z-index": 89
+            "z-index": zIndexCounter++
         },
         "on": {
+            "mousedown": function (event) {
+                eventTargetId = event.target.id != "" ? event.target.id : event.target.parentElement.id;
+                extractedId = extractId(eventTargetId);
+                console.log(event);
+                connection.invoke("BringToFront", parseInt(extractedId)).catch(function (err) {
+                    return console.error(err.toString());
+                });
+                
+            },
             "click": function (event) {
-                console.log("mousedown note");
-                //event.stopPropagation();
-                //event.stopImmediatePropagation();
+                console.log("click note");
+                event.stopPropagation();
+                event.stopImmediatePropagation();
             }
         }
     };
@@ -254,12 +280,12 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
                 if (event.which != 1) {
                     return;
                 }
+                $(".note").addClass("disabled").removeClass("enabled");
                 console.log("mousedown note text");
                 editedNote = $(this);
                 editedId = extractId(event.target.parentElement.id);
                 isEditing = true;
-                var editB = $(this).siblings(".edit-button");
-                $(editB).removeClass("disabled").addClass("enabled");
+                $(this).parent().removeClass("disabled").addClass("enabled");
             },
             "keypress": function() {
                 if ($(this).get(0).scrollHeight > $(this).height() & $(this).css('font-size') > 5) {
@@ -286,13 +312,13 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
     };
 
     var editButton = {
-        class: "material-icons edit-button action-button disabled",
+        class: "material-icons edit-button action-button",
         text: "edit",
         "on" : {
             "mousedown": function (event) {
                 event.stopPropagation();
                 event.stopImmediatePropagation();
-                $(this).removeClass("enabled").addClass("disabled");
+                $(this).parent().removeClass("enabled").addClass("disabled");
 
                 var noteSelector = "#note-" + id;
                 var note = $(noteSelector);
@@ -378,6 +404,11 @@ let handleEditTextNoteEvent = function(id, text)
 let handleNoteDeletedEvent = function(id) {
     var noteSelector = "#note-" + id;
     $(noteSelector).remove();
+};
+
+let handleBringToFrontEvent = function (id) {
+    var noteSelector = "#note-" + id;
+    $(noteSelector).css('z-index', zIndexCounter++);
 };
 
 let extractId = function(elementId) {

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MeetingNotes.Repository\MeetingNotes.Repository.csproj" />
+    <ProjectReference Include="..\MeetingNotes.Repository\MeetingBoard.Repository.csproj" />
   </ItemGroup>
 
 </Project>

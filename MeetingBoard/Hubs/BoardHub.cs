@@ -29,5 +29,10 @@ namespace MeetingBoard.Hubs
         {
             await Clients.All.SendAsync("DeleteNote", id);
         }
+
+        public async Task BringToFront(int id)
+        {
+            await Clients.All.SendAsync("BringToFront", id);
+        }
     }
 }

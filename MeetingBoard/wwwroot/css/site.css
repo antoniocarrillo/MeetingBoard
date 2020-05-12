@@ -9,7 +9,52 @@ for details on configuring this project to bundle and minify static web assets. 
     src: local('Material Icons'), local('MaterialIcons-Regular'), url(../fonts/MaterialIcons-Regular.woff2) format('woff2'), url(../fonts/MaterialIcons-Regular.woff) format('woff'), url(../fonts/MaterialIcons-Regular.ttf) format('truetype');
 }
 
-.material-icons {
+@font-face {
+    font-family: 'Comic Neue';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Comic Neue'), local('ComicNeue-Regular'), url(../fonts/ComicNeue-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Indie Flower';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Indie Flower'), local('IndieFlower-Regular'), url(../fonts/IndieFlower-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lato'), local('Lato-Regular'), url(../fonts/Lato-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Patrick Hand';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Patrick Hand'), local('PatrickHand-Regular'), url(../fonts/PatrickHand-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Roboto'), local('Roboto-Regular'), url(../fonts/RobotoSlab-VariableFont_wght.ttf) format('truetype');
+}
+
+.cork-background {
+    background-image: url("../img/cork.jpg");
+    background-repeat: repeat;
+    background-size: 200px;
+}
+
+.chalk-background {
+    background-color: black;
+}
+
+    .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
     font-style: normal;
@@ -98,13 +143,23 @@ body {
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
+  background: #fff;
 }
+
+.board-header h2 {
+display:inline-block;
+}
+
+.board-header a {
+    display: inline-block;
+}
+
 
 .note {
     position: absolute;
     /*background: yellow;*/
     /*border: solid 1px black;*/
-    font-family:'Reenie Beanie';
+    font-family: 'Calibri';
     font-size:22px;
     text-align:center;
     background: #ffff88; /* Old browsers */
@@ -143,8 +198,9 @@ body {
 }
 
 .note-text {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
     padding-top: 30px;
     position: relative;
 }
@@ -173,22 +229,27 @@ textarea:focus {
     background: red;
 }
 
-.delete-button:hover {
-    cursor: crosshair;
+.action-button:hover {
+    cursor: pointer;
 }
 
 .edit-button {
     right: 25px;
 }
 
-    .edit-button.enabled {
-        background: green;
-    }
+.note.enabled
+{
+    border: 1px solid black;
+}
 
-    .edit-button.disabled {
-        background: grey;
-        color:black;
-    }
+.note.enabled .edit-button {
+    background: green;
+}
+
+.note.disabled .edit-button {
+    background: grey;
+    color: black;
+}
 
 .delete-button:hover {
     cursor: default;

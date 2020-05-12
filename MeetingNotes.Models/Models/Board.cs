@@ -21,7 +21,7 @@ namespace MeetingNotes.Models.Models
         [Required]
         public string Title { get; set; }
 
-        public Uri Background { get; set; }
+        public string Background { get; set; }
 
         public List<Note> Notes { get; set; }
 
@@ -35,8 +35,23 @@ namespace MeetingNotes.Models.Models
 
         [NotMapped]
         public string Password {
-            get { return Encryption.DecryptString(PasswordStored); }
-            set { PasswordStored = Encryption.EncryptString(value); }
+            get {
+                if(PasswordStored !=null)
+                {
+                    return Encryption.DecryptString(PasswordStored);
+                }
+                else
+                {
+                    return null;
+                }
+
+}
+            set { 
+                if(value != null)
+                    {
+                        PasswordStored = Encryption.EncryptString(value);
+                    }
+                }
         }
     }
 }

@@ -1,14 +1,22 @@
 ﻿@model MeetingNotes.Models.Models.Board
 
 @{
-    ViewData["Title"] = "Details";
-}
+    ViewData["Title"] = Model.Title;
+    string[] fonts = new string[] { "Comic Neue", "Indie Flower", "Lato", "Patrick Hand", "Roboto Slab" };
+    var Background = Model.Background == String.Empty ? "white" : Model.Background;
+    }
 
-<h1>
-    @Html.DisplayNameFor(model => model.Title)
-</h1>
-<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-<a asp-action="Index">Back to List</a>
+@section Board
+{
+    <h2>
+        @Html.DisplayFor(model => model.Title)
+    </h2>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    @Html.DropDownList("Fonts",
+                        new SelectList(fonts),
+                        "Calibri",
+                        new { id = "font-selector", @class = "dropdown" })
+}
 
 @section Scripts
 {
@@ -18,7 +26,8 @@
         const EditNotePositionAction = '@Url.Action("EditPosition","Notes")'
         const ChangeNoteTextAction = '@Url.Action("ChangeText","Notes")'
         let DeleteNoteAction = '@Url.Action("Delete","Notes")'
-        let notesArray = @Html.Raw(Json.Serialize(Model.Notes));
+        let notesArray = @Html.Raw(Json.Serialize(Model.Notes))
+        let boardBackground = '@Background'
     </script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 }

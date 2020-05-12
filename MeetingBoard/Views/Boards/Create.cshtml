@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    string[] backgrounds = new string[] { "cork", "chalk" }; //TODO: This is a horrible way to do this. Fix it
 }
 
 <h1>Create</h1>
@@ -18,9 +19,12 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Background" class="control-label"></label>
-                <input asp-for="Background" class="form-control" />
-                <span asp-validation-for="Background" class="text-danger"></span>
+                @Html.DropDownList("Fonts",
+                       new SelectList(backgrounds),
+                       "white",
+                       new { id = "background-selector", @class = "dropdown" })
+
+                @Html.HiddenFor(model => model.Background)
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -29,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input id="password-field" asp-for="Password" class="form-control" />
+                <input disabled id="password-field" asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -45,22 +49,18 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script>
-    $(document).ready(function () {
-        handleCheckboxChanged();
-
-        $('#password-checkbox').on("click",
-            function () {
-                handleCheckboxChanged();
-            });
+    <script>
+        $("#background-selector").change(function () {
+            var newBackground = $("#background-selector").val();
+            $("#Background").val(newBackground);
         });
 
-    let handleCheckboxChanged = function () {
-        if ($('#password-checkbox').is(':checked')) {
-            $("#password-field").removeAttr('disabled');
-        } else {
-            $("#password-field").attr("disabled", "disabled");
-        };
-    };
-</script>
+        $("#password-checkbox").change(function () {
+            if (this.checked) {
+                $("#password-field").prop("disabled", false );
+            } else {
+                $("#password-field").prop("disabled", true );
+            }
+        });
+    </script>
 }
