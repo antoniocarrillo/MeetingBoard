@@ -54,7 +54,6 @@ namespace MeetingBoard.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Board board)
         {
             if (ModelState.IsValid)
@@ -86,7 +85,6 @@ namespace MeetingBoard.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Board board)
         {
             if (id != board.Id)
@@ -137,7 +135,6 @@ namespace MeetingBoard.Controllers
 
         // POST: Boards/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var board = await _context.Boards.FindAsync(id);

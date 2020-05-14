@@ -1,82 +1,22 @@
 ﻿let connection;
 
-let isDragging = false
-let isEditing = false
-let finishEditing = false
-let editedNote
-let editedId = 0
+let isDragging = false;
+let isEditing = false;
+let finishEditing = false;
+let editedNote;
+let editedId = 0;
 let boardId = 0;
-let siteName = ""
+let siteName = "";
+let zIndexCounter = 4;
 
-const defaultWidth = 300
-const defaultHeight = 300
-
-let zIndexCounter = 4
-
+const defaultWidth = 300;
+const defaultHeight = 300;
 
 $(document).ready(function () {
-    //var container = $("#main-container");
-    //var boardDefinition = {
-    //    id: "board"
-    //};
-    //var board = $("<div>", boardDefinition);
-    $("<div id='board'></div>").insertAfter("#main-container");
 
-    $.each(notesArray, function (index, value) {
-        handleNoteCreatedEvent(value.id, value.x, value.y, value.width, value.height, value.text);
-    });
+    initializeBoard();
 
-
-    $("#board").addClass(boardBackground + "-background");
-
-    $("#board").click(function (e) {
-        console.log("click board");
-        if (e.which != 1) {
-            return;
-        }
-        createNote(e);
-    });
-    $("#board").mousedown(function () {
-        console.log("mousedown board");
-
-    });
-    $("#board").mouseup(function (e) {
-        console.log("mouseup board");
-    });
-
-    var pathArray = window.location.pathname.split('/');
-    firstPathElement = pathArray[1];
-    boardId = pathArray[3];
-
-    siteName = firstPathElement != "Boards" ? ("/" + siteName) : ""; 
-
-    connection = new signalR.HubConnectionBuilder().withUrl(siteName + "/boardHub").build();
-    connection.start();
-
-    connection.on("CreateNote", function (id, left, top, width, height) {
-        handleNoteCreatedEvent(id, left, top, width, height, "");
-    });
-
-    connection.on("ResizeNote", function (id, width, height) {
-        handleNoteResizedEvent(id, width, height);
-    });
-
-    connection.on("MoveNote", function (id, left, top) {
-        handleNoteMovedEvent(id, left, top);
-    });
-
-    connection.on("EditTextNote", function (id, text) {
-        handleEditTextNoteEvent(id, text);
-    });
-
-    connection.on("DeleteNote", function (id) {
-        handleNoteDeletedEvent(id);
-    });
-
-    connection.on("BringToFront", function (id) {
-        handleBringToFrontEvent(id);
-       
-    });
+    connectSignalRHub();
 
     $("#font-selector").change(function () {
         var newFont = $("#font-selector").val();
@@ -84,41 +24,7 @@ $(document).ready(function () {
     });
 });
 
-
-let createNote = function(e) {
-    //if (isDragging)
-    //    return;
-
-    // Enters right after clicked on text area
-    // Prevents creation of note, since thats not intention
-    if (isEditing) {
-        isEditing = false;
-        finishEditing = true
-        return;
-    }
-
-    // Enter right when you click outside the text and you were entering text
-    // Triggers saving the text
-    if (finishEditing) {
-        finishEditing = false;
-        var text = editedNote.val();
-        sendChangeNoteTextRequest(editedId, text);
-    }
-
-    sendCreateNoteRequest(e.clientX, e.clientY, defaultWidth, defaultHeight);
-};
-
-//let resizableHandle = function ()
-//{
-//    $(".ui-resizable-handle").on("click",
-//    function (event) {
-//        event.stopPropagation();
-//        event.stopImmediatePropagation();
-//        console.log("note text click");
-//    });
-//}
-
-
+/* UI HANDLING METHODS */
 
 let handleStartDragging = function(event, ui) {
     isDragging = true;
@@ -148,6 +54,8 @@ let handleStopResizing = function (event, ui) {
     event.stopImmediatePropagation();
 }
 
+/* AJAX REQUESTS METRHODS */
+
 let sendCreateNoteRequest = function(x, y, width, height) {
     var note = {
         id: 0,
@@ -155,6 +63,7 @@ let sendCreateNoteRequest = function(x, y, width, height) {
         y: y,
         width: width,
         height: height,
+        text: " ",
         boardId: boardId
     }
 
@@ -245,6 +154,8 @@ let sendDeleteNoteRequest = function(id) {
         }
     });
 }
+
+/* HANDLE SIGNALR EVENTS */
 
 let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
     let board = $("#board");
@@ -416,6 +327,91 @@ let handleNoteDeletedEvent = function(id) {
 let handleBringToFrontEvent = function (id) {
     var noteSelector = "#note-" + id;
     $(noteSelector).css('z-index', zIndexCounter++);
+};
+
+/* AUXILIARY METHODS */
+
+let initializeBoard = function() {
+    $("<div id='board'></div>").insertAfter("#main-container");
+
+    $.each(notesArray,
+        function(index, value) {
+            handleNoteCreatedEvent(value.id, value.x, value.y, value.width, value.height, value.text);
+        });
+
+    $("#board").addClass(boardBackground + "-background");
+
+    $("#board").click(function(e) {
+        if (e.which != 1) {
+            return;
+        }
+
+        if (isEditing) {
+            isEditing = false;
+            finishEditing = true
+            return;
+        }
+
+        // Enter right when you click outside the text and you were entering text
+        // Triggers saving the text
+        if (finishEditing) {
+            finishEditing = false;
+            var text = editedNote.val();
+            sendChangeNoteTextRequest(editedId, text);
+        }
+
+        sendCreateNoteRequest(e.clientX, e.clientY, defaultWidth, defaultHeight);
+    });
+
+    $("#board").mousedown(function() {
+        console.log("mousedown board");
+
+    });
+    $("#board").mouseup(function(e) {
+        console.log("mouseup board");
+    });
+};
+
+let connectSignalRHub = function() {
+    var pathArray = window.location.pathname.split('/');
+    firstPathElement = pathArray[1];
+    boardId = pathArray[3];
+
+    siteName = firstPathElement != "Boards" ? ("/" + siteName) : "";
+
+    connection = new signalR.HubConnectionBuilder().withUrl(siteName + "/boardHub").build();
+    connection.start();
+
+    connection.on("CreateNote",
+        function(id, left, top, width, height) {
+            handleNoteCreatedEvent(id, left, top, width, height, "");
+        });
+
+    connection.on("ResizeNote",
+        function(id, width, height) {
+            handleNoteResizedEvent(id, width, height);
+        });
+
+    connection.on("MoveNote",
+        function(id, left, top) {
+            handleNoteMovedEvent(id, left, top);
+        });
+
+    connection.on("EditTextNote",
+        function(id, text) {
+            handleEditTextNoteEvent(id, text);
+        });
+
+    connection.on("DeleteNote",
+        function(id) {
+            handleNoteDeletedEvent(id);
+        });
+
+    connection.on("BringToFront",
+        function(id) {
+            handleBringToFrontEvent(id);
+
+        });
 };
 
 let extractId = function(elementId) {

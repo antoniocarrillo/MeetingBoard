@@ -80,7 +80,7 @@ namespace MeetingBoard.Controllers
                 return newNote.Id;
             }
 
-            return 0;
+            return -1;
         }
 
         // GET: Notes/Edit/5
