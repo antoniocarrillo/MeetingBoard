@@ -6,6 +6,7 @@ let finishEditing = false
 let editedNote
 let editedId = 0
 let boardId = 0;
+let siteName = ""
 
 const defaultWidth = 300
 const defaultHeight = 300
@@ -44,9 +45,12 @@ $(document).ready(function () {
     });
 
     var pathArray = window.location.pathname.split('/');
+    firstPathElement = pathArray[1];
     boardId = pathArray[3];
 
-    connection = new signalR.HubConnectionBuilder().withUrl("/boardHub").build();
+    siteName = firstPathElement != "Boards" ? ("/" + siteName) : ""; 
+
+    connection = new signalR.HubConnectionBuilder().withUrl(siteName + "/boardHub").build();
     connection.start();
 
     connection.on("CreateNote", function (id, left, top, width, height) {
@@ -159,7 +163,10 @@ let sendCreateNoteRequest = function(x, y, width, height) {
         url: CreateNoteAction,
         data: { note: note },
         dataType: "json",
-        success: function(id) {
+        success: function (id) {
+            if (id == 0) {
+                console.log("something went wrong");
+            }
             connection.invoke("CreateNote", id, x, y, width, height).catch(function(err) {
                 return console.error(err.toString());
             });

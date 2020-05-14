@@ -7,15 +7,14 @@
     }
 
 @section Board
-{
-    <h2>
-        @Html.DisplayFor(model => model.Title)
-    </h2>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+{    
     @Html.DropDownList("Fonts",
                         new SelectList(fonts),
                         "Calibri",
                         new { id = "font-selector", @class = "dropdown" })
+<h2>
+    @Html.DisplayFor(model => model.Title)
+</h2>
 }
 
 @section Scripts

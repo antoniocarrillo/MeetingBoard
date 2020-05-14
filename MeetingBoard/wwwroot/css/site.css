@@ -147,11 +147,13 @@ body {
 }
 
 .board-header h2 {
-display:inline-block;
+display:inline;
+vertical-align: sub;
+margin-left:20px;
 }
 
 .board-header a {
-    display: inline-block;
+    display: inline;
 }
 
 
