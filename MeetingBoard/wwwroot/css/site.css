@@ -44,6 +44,12 @@ for details on configuring this project to bundle and minify static web assets. 
     src: local('Roboto'), local('Roboto-Regular'), url(../fonts/RobotoSlab-VariableFont_wght.ttf) format('truetype');
 }
 
+.sailboat-background {
+    background-image: url("../img/sailboat.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 .cork-background {
     background-image: url("../img/cork.jpg");
     background-repeat: repeat;
