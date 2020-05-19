@@ -373,11 +373,11 @@ let initializeBoard = function() {
 };
 
 let connectSignalRHub = function() {
-    var pathArray = window.location.pathname.split('/');
+     var pathArray = window.location.pathname.split('/');
     firstPathElement = pathArray[1];
-    boardId = pathArray[3];
+    boardId = pathArray[pathArray.length-1];
 
-    siteName = firstPathElement != "Boards" ? ("/" + siteName) : "";
+    siteName = firstPathElement != "Boards" ? ("/" + firstPathElement) : ""; 
 
     connection = new signalR.HubConnectionBuilder().withUrl(siteName + "/boardHub").build();
     connection.start();
