@@ -6,6 +6,7 @@ let finishEditing = false;
 let editedNote;
 let editedId = 0;
 let boardId = 0;
+let boardIdString = "";
 let siteName = "";
 let zIndexCounter = 4;
 
@@ -76,7 +77,7 @@ let sendCreateNoteRequest = function(x, y, width, height) {
             if (id == 0) {
                 console.log("something went wrong");
             }
-            connection.invoke("CreateNote", id, x, y, width, height).catch(function(err) {
+            connection.invoke("CreateNote", boardIdString, id, x, y, width, height).catch(function(err) {
                 return console.error(err.toString());
             });
         },
@@ -93,7 +94,7 @@ let sendResizeNoteRequest = function(id, width, height) {
         data: { id: id, width: width, height: height},
         dataType: "json",
         success: function (res) {
-            connection.invoke("ResizeNote", parseInt(id), width, height).catch(function (err) {
+            connection.invoke("ResizeNote", boardIdString, parseInt(id), width, height).catch(function (err) {
                 return console.error(err.toString());
             });
         },
@@ -111,7 +112,7 @@ let sendMoveNoteRequest = function(id, x, y) {
         dataType: "json",
         success: function(res) {
             console.log("done moving note" + res);
-            connection.invoke("MoveNote", parseInt(id), x, y).catch(function(err) {
+            connection.invoke("MoveNote", boardIdString, parseInt(id), x, y).catch(function(err) {
                 return console.error(err.toString());
             });
         },
@@ -129,7 +130,7 @@ let sendChangeNoteTextRequest = function(id, text) {
         dataType: "json",
         success: function(res) {
             console.log("done moving note" + res);
-            connection.invoke("EditTextNote", parseInt(id), text).catch(function(err) {
+            connection.invoke("EditTextNote", boardIdString, parseInt(id), text).catch(function(err) {
                 return console.error(err.toString());
             });
         },
@@ -145,7 +146,7 @@ let sendDeleteNoteRequest = function(id) {
         data: { id: id },
         url: DeleteNoteAction + "/" + id,
         success: function(res) {
-            connection.invoke("DeleteNote", parseInt(id)).catch(function(err) {
+            connection.invoke("DeleteNote", boardIdString, parseInt(id)).catch(function(err) {
                 return console.error(err.toString());
             });
         },
@@ -176,7 +177,7 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
                 eventTargetId = event.target.id != "" ? event.target.id : event.target.parentElement.id;
                 extractedId = extractId(eventTargetId);
                 console.log(event);
-                connection.invoke("BringToFront", parseInt(extractedId)).catch(function (err) {
+                connection.invoke("BringToFront", boardIdString, parseInt(extractedId)).catch(function (err) {
                     return console.error(err.toString());
                 });
                 
@@ -376,11 +377,17 @@ let connectSignalRHub = function() {
      var pathArray = window.location.pathname.split('/');
     firstPathElement = pathArray[1];
     boardId = pathArray[pathArray.length-1];
+    boardIdString = boardId.toString();
 
     siteName = firstPathElement != "Boards" ? ("/" + firstPathElement) : ""; 
 
     connection = new signalR.HubConnectionBuilder().withUrl(siteName + "/boardHub").build();
-    connection.start();
+    var boardString = boardId.toString();
+    connection.start().then(() =>
+        connection.invoke("JoinBoard", boardIdString).catch(function (err) {
+            return console.error(err.toString());
+        }));
+
 
     connection.on("CreateNote",
         function(id, left, top, width, height) {

@@ -5,34 +5,48 @@ namespace MeetingBoard.Hubs
 {
     public class BoardHub : Hub
     {
-        public async Task CreateNote(int id, int left, int top, int width, int height)
+        public async Task JoinBoard(string boardId)
         {
-            await Clients.All.SendAsync("CreateNote", id, left, top, width, height);
+            await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
+
+            await Clients.Group(boardId).SendAsync("Send", $"{Context.ConnectionId} has joined the board {boardId}.");
         }
 
-        public async Task ResizeNote(int id, int width, int height)
+        public async Task LeaveGroup(string boardId)
         {
-            await Clients.All.SendAsync("ResizeNote", id, width, height);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, boardId);
+
+            await Clients.Group(boardId).SendAsync("Send", $"{Context.ConnectionId} has left the group {boardId}.");
         }
 
-        public async Task MoveNote(int id, int left, int top)
+        public async Task CreateNote(string boardId, int id, int left, int top, int width, int height)
         {
-            await Clients.All.SendAsync("MoveNote", id, left, top);
+            await Clients.Group(boardId).SendAsync("CreateNote", id, left, top, width, height);
         }
 
-        public async Task EditTextNote(int id, string text)
+        public async Task ResizeNote(string boardId, int id, int width, int height)
         {
-            await Clients.All.SendAsync("EditTextNote", id, text);
+            await Clients.Group(boardId).SendAsync("ResizeNote", id, width, height);
         }
 
-        public async Task DeleteNote(int id)
+        public async Task MoveNote(string boardId, int id, int left, int top)
         {
-            await Clients.All.SendAsync("DeleteNote", id);
+            await Clients.Group(boardId).SendAsync("MoveNote", id, left, top);
         }
 
-        public async Task BringToFront(int id)
+        public async Task EditTextNote(string boardId, int id, string text)
         {
-            await Clients.All.SendAsync("BringToFront", id);
+            await Clients.Group(boardId).SendAsync("EditTextNote", id, text);
+        }
+
+        public async Task DeleteNote(string boardId, int id)
+        {
+            await Clients.Group(boardId).SendAsync("DeleteNote", id);
+        }
+
+        public async Task BringToFront(string boardId, int id)
+        {
+            await Clients.Group(boardId).SendAsync("BringToFront", id);
         }
     }
 }
