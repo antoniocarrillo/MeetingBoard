@@ -1,10 +1,8 @@
 ﻿let connection;
 
+let connectionId = "";
+
 let isDragging = false;
-let isEditing = false;
-let finishEditing = false;
-let editedNote;
-let editedId = 0;
 let boardId = 0;
 let boardIdString = "";
 let siteName = "";
@@ -130,7 +128,7 @@ let sendChangeNoteTextRequest = function(id, text) {
         dataType: "json",
         success: function(res) {
             console.log("done moving note" + res);
-            connection.invoke("EditTextNote", boardIdString, parseInt(id), text).catch(function(err) {
+            connection.invoke("EditTextNote", boardIdString, connectionId, parseInt(id), text).catch(function(err) {
                 return console.error(err.toString());
             });
         },
@@ -201,18 +199,21 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
                 }
                 $(".note").addClass("disabled").removeClass("enabled");
                 console.log("mousedown note text");
-                editedNote = $(this);
-                editedId = extractId(event.target.parentElement.id);
-                isEditing = true;
-                $(this).parent().removeClass("disabled").addClass("enabled");
+               $(this).parent().removeClass("disabled").addClass("enabled");
             },
-            "keypress": function() {
+            "keyup": function() {
                 if ($(this).get(0).scrollHeight > $(this).height() & $(this).css('font-size') > 5) {
                     $(this).css('font-size', '-=1');
                     console.log("something happened");
                 } else if ($(this).get(0).scrollHeight < $(this).height() & $(this).css('font-size') < 14) {
                     $(this).css('font-size', '+=1');
                 }
+                var elemId = extractId($(this)[0].parentElement.id);
+                var nText = $(this).val();
+
+                console.log(nText);
+
+                sendChangeNoteTextRequest(elemId, nText);
             }
         }
     };
@@ -230,26 +231,6 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
         }
     };
 
-    var editButton = {
-        class: "material-icons edit-button action-button",
-        text: "edit",
-        "on" : {
-            "mousedown": function (event) {
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-                $(this).parent().removeClass("enabled").addClass("disabled");
-
-                var noteSelector = "#note-" + id;
-                var note = $(noteSelector);
-                var noteText = note.find(".note-text");
-
-                console.log(noteText.val());
-
-                sendChangeNoteTextRequest(editedId, noteText.val());
-            }
-        }
-    };
-
     var moveArea = {
         class: "move-area"
     };
@@ -257,7 +238,6 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
     let $noteHtml = $("<div>", note);
     let $noteText = $("<textarea>", noteText);
     let $deleteButtonHtml = $("<i>", deleteButton);
-    let $editButtonHtml = $("<i>", editButton);
     let $moveAreaHtml = $("<div>", moveArea);
 
     $noteText.val(text);
@@ -291,7 +271,6 @@ let handleNoteCreatedEvent = function(id, x, y, width, height, text) {
 
     $noteHtml.append($noteText);
     $noteHtml.append($deleteButtonHtml);
-    $noteHtml.append($editButtonHtml);
     $noteHtml.append($moveAreaHtml);
 
     board.append($noteHtml);
@@ -313,11 +292,13 @@ let handleNoteResizedEvent = function(id, width, height)
     note.css('height', height + 'px');
 };
 
-let handleEditTextNoteEvent = function(id, text)
+let handleEditTextNoteEvent = function(id, messageConnectionId, text)
 {
-    var noteTextSelector = "#note-" + id + " .note-text";
-    var noteText = $(noteTextSelector);
-    noteText.val(text);
+    if (messageConnectionId != connectionId) {
+        var noteTextSelector = "#note-" + id + " .note-text";
+        var noteText = $(noteTextSelector);
+        noteText.val(text);
+    }
 };
 
 let handleNoteDeletedEvent = function(id) {
@@ -346,21 +327,6 @@ let initializeBoard = function() {
         if (e.which != 1) {
             return;
         }
-
-        if (isEditing) {
-            isEditing = false;
-            finishEditing = true
-            return;
-        }
-
-        // Enter right when you click outside the text and you were entering text
-        // Triggers saving the text
-        if (finishEditing) {
-            finishEditing = false;
-            var text = editedNote.val();
-            sendChangeNoteTextRequest(editedId, text);
-        }
-
         sendCreateNoteRequest(e.clientX, e.clientY, defaultWidth, defaultHeight);
     });
 
@@ -386,8 +352,7 @@ let connectSignalRHub = function() {
     connection.start().then(() =>
         connection.invoke("JoinBoard", boardIdString).catch(function (err) {
             return console.error(err.toString());
-        }));
-
+        })).then(() => connectionId = connection.connection.connectionId);
 
     connection.on("CreateNote",
         function(id, left, top, width, height) {
@@ -405,8 +370,8 @@ let connectSignalRHub = function() {
         });
 
     connection.on("EditTextNote",
-        function(id, text) {
-            handleEditTextNoteEvent(id, text);
+        function(id, messageConnectionId, text) {
+            handleEditTextNoteEvent(id, messageConnectionId, text);
         });
 
     connection.on("DeleteNote",

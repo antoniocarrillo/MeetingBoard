@@ -34,9 +34,9 @@ namespace MeetingBoard.Hubs
             await Clients.Group(boardId).SendAsync("MoveNote", id, left, top);
         }
 
-        public async Task EditTextNote(string boardId, int id, string text)
+        public async Task EditTextNote(string boardId, string connectionId, int id, string text)
         {
-            await Clients.Group(boardId).SendAsync("EditTextNote", id, text);
+            await Clients.Group(boardId).SendAsync("EditTextNote", id, connectionId, text);
         }
 
         public async Task DeleteNote(string boardId, int id)
